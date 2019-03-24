@@ -100,7 +100,7 @@ public class InMemoryCategoryDAO {
                 ? categoryName.split("\\S+")[0].length()
                 : 0;
 
-    }
+    } 
 
 }
 
