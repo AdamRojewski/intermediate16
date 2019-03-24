@@ -1,8 +1,11 @@
 package pl.sda.intermediate16;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,9 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class InMemoryCategoryDAO {
+    @Getter
     private List<Category> categoryList = new ArrayList<>();
 
-    public InMemoryCategoryDAO(){
+    public InMemoryCategoryDAO() {
         initializeCategories();
     }
 
@@ -23,7 +27,7 @@ public class InMemoryCategoryDAO {
         URI uri = null;
         try {
             uri = classLoader.getResource("kategorie.txt").toURI();
-            List<String> lines = Files.readAllLines(Paths.get(uri));
+            List<String> lines = Files.readAllLines(Paths.get(uri), StandardCharsets.UTF_16LE);
             return lines;
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
@@ -68,11 +72,18 @@ public class InMemoryCategoryDAO {
     }
 
     private void populateParentId(Map<Integer, List<Category>> categoriesMap, int depth) {
+        findAndSetParentId(categoriesMap, depth);
+        if (categoriesMap.containsKey(depth + 1)) {
+            populateParentId(categoriesMap, depth + 1);
+        }
+    }
+
+    private void findAndSetParentId(Map<Integer, List<Category>> categoriesMap, int depth) {
         List<Category> children = categoriesMap.get(depth);
         children.stream()
                 .forEach(c -> {
                     List<Category> potentialParents = categoriesMap.get(depth - 1);
-                    Integer parentID = potentialParents.stream()
+                    Integer parentID = potentialParents == null ? null : potentialParents.stream()
                             .map(Category::getId)
                             .filter(id -> id < c.getId())
                             .sorted((a, b) -> b - a)
@@ -81,13 +92,13 @@ public class InMemoryCategoryDAO {
                             .orElse(null);
                     c.setParentID(parentID);
                 });
-        if (categoriesMap.containsKey(depth+1)) {
-            populateParentId(categoriesMap, depth + 1);
-        }
     }
 
     private Integer calculateDepth(String categoryName) {
-        categoryName.split("\\S+")[0].length();
+
+        return categoryName.startsWith(" ")
+                ? categoryName.split("\\S+")[0].length()
+                : 0;
 
     }
 
