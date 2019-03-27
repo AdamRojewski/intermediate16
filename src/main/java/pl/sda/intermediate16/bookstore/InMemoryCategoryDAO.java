@@ -1,4 +1,4 @@
-package pl.sda.intermediate16;
+package pl.sda.intermediate16.bookstore;
 
 import lombok.Getter;
 
@@ -17,6 +17,19 @@ import java.util.stream.Collectors;
 public class InMemoryCategoryDAO {
     @Getter
     private List<Category> categoryList = new ArrayList<>();
+    private static InMemoryCategoryDAO instance;
+
+    public static InMemoryCategoryDAO getInstance(){
+        if (instance ==null){
+            synchronized (InMemoryCategoryDAO.class) { // bylo this, ale kontekst statyczny nie moze sie odwolywac do niestetycznego
+                if (instance == null) {
+                        instance = new InMemoryCategoryDAO();
+                    }
+                }
+            }
+        return instance;
+    }
+
 
     public InMemoryCategoryDAO() {
         initializeCategories();

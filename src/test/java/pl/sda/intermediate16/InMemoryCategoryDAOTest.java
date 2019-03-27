@@ -2,10 +2,10 @@ package pl.sda.intermediate16;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import pl.sda.intermediate16.bookstore.Category;
+import pl.sda.intermediate16.bookstore.InMemoryCategoryDAO;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryCategoryDAOTest {
     @Test
